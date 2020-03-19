@@ -1,0 +1,105 @@
+{% extends "index.html" %}
+{% block head %} zk 首页 {% endblock %}
+{% block GroupTable %}
+
+{% for group in counts.group_data %}
+<tr>
+    <td type="button"  class="btn  btn-default" onclick="toggle('{{ group }}')">{{ group }}</td>
+    <td>
+        <!-- 使用了俩个 Bootstrap 的 icon 代表编辑和删除操作 -->
+        <div class="btn-group" role="group">
+            <a href="#" type="button" class="btn btn-default" title="编辑">
+                <span class="glyphicon glyphicon-pencil" title="编辑" aria-hidden="true"> </span>
+            </a>
+            <a href="#" type="button" class="btn btn-default" title="删除">
+                <span class="glyphicon glyphicon-trash" title="删除" aria-hidden="true"></span>
+            </a>
+        </div>
+    </td>
+</tr>
+{% endfor %}
+{% endblock %}
+
+{% block DataTable %}
+
+{{ counts }}
+
+{{ counts.group_data["{{group}}"] }}
+{% for group in counts.group_data %}
+    <table class="table table-striped" style="table-layout: fixed;word-break:break-all; word-wrap:break-all; margin-bottom: 50px;  display:none;"  id="{{ group }}">
+        <thead>
+            <tr>
+                <th>key</th>
+                <th>value</th>
+            </tr>
+        </thead>
+        {% for key in counts.group_data[group] %}
+        <tbody >
+            <tr>
+                <td>{{key}}</td>
+                <td>{{counts.group_data[group][key]}}</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+{% endfor %}
+
+{% endblock %}
+
+
+
+
+<!--
+<script type="text/javascript">
+    function toggle(id){
+    var tb=document.getElementById(id);
+    if(tb.style.display=='none') tb.style.display='block';
+    else tb.style.display='none';
+    }
+</script>
+</head>
+<body>
+<input type="button" value="显示/隐藏" onClick="toggle('table1')"/>
+
+<table border="1" id="table1">
+<tr><td>2</td><td>3</td></tr>
+</table>
+-->
+
+<!--
+    <div class="panel-group container" id="{{group}}">
+        {% for group in counts.groups %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#{{group}}" 
+                           href="#{{group}}">
+                            {{ group }}
+                        </a>
+                    </h4>
+                </div>
+                <div id="{{group}}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <table class="table table-striped" style="table-layout: fixed;word-break:break-all; word-wrap:break-all; margin-bottom: 50px;">
+                    <caption>内容</caption>
+                    <thead>
+                        <tr>
+                            <th>key</th>
+                            <th>value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key in counts[group] %}
+                        <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ counts[group][key] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+-->

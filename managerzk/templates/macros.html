@@ -1,0 +1,35 @@
+<!-- 需要传入2个参数：要渲染的 form 和点击提交请求的 url -->
+{% macro render_form(form, url) %}
+
+<form method="POST" action="{{ url }}">
+  <!-- 将 csrf_token 渲染在表单开始的位置 -->
+  {{ form.csrf_token }}
+  <!-- 迭代每个表单 field -->
+  {% for field in form %}
+    <!-- 如果是 csrf_token 就不再渲染了 -->
+    {% if field.type == 'CSRFTokenField' %}
+    {{ '' }}
+    <!-- SubmitField 单独特殊处理 -->
+    {% elif field.type == 'SubmitField' %}
+    {{ form.submit(class='btn btn-primary', type='submit') }}
+    <!-- BooleanField 单独特殊处理 -->
+    {% elif field.type == 'BooleanField' %}
+    <div class="checkbox">
+      <label>{{ field() }} {{ field.label.text }}</label>
+    </div>
+    {% else %}
+    <div class="form-group {% if field.errors %}has-error{% endif %}" >
+      <!-- 当 errors 不为空，遍历显示每一个 error -->
+      {{ field.label }} {{ field(class='form-control') }}
+      {% if field.errors %}
+        {% for error in field.errors %}
+        <!-- 根据 Bootstrap 样式错误信息要显示先类为 help-block 的 span 标签中-->
+        <span class="help-block">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+    {% endif %}
+  {% endfor %}
+</form>
+
+{% endmacro %}

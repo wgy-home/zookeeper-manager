@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% block head %} zk 首页 {% endblock %}
+{% block js %}
+<script src="{{ url_for('static', filename="js/main.js") }}"></script>
+<script src="{{ url_for('static', filename="js/fileinput.min.js") }}"></script>
+
+<link href="{{ url_for('static', filename="css/fileinput-rtl.min.css") }}" rel="stylesheet" type="text/css">
+<link href="{{ url_for('static', filename="css/fileinput.min.css") }}" rel="stylesheet" type="text/css">
+<link href="{{ url_for('static', filename="css/bootstrap-theme.min.css") }}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+
+<div class="panel-group container" id="{{group}}">
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="MyProperty" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">添加zookeeper属性</h4>
+                </div>
+                <div class="modal-body">
+
+                    <form id="zkPropertryFrom" class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="ckey" class="col-sm-2 control-label">key</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="ckey" placeholder="请输入key">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvalue" class="col-sm-2 control-label">value</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="cvalue" placeholder="请输入value">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <input type="button" value="添加" class="btn btn-default "
+                                    onclick="CreateProperty('{{counts.env}}','{{counts.node}}','{{counts.version}}', this.parentNode.parentNode.rowIndex)"
+                                    data-dismiss="modal">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <!-- import group 模态框 -->
+
+    <div class="modal fade" id="importGroupModal" tabindex="-1" role="dialog" aria-labelledby="importGroupModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importGroupModalLabel">Group导入</h5>
+                </div>
+
+                <div class="modal-body">
+                    <label class="control-label">Select File</label>
+                    <input type="file" name="iGroupName" id="importGroupValue" value="" multiple="multiple"
+                        data-show-preview="true" />
+                    <div id="kartik-file-errors"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 属性修改模态框（Modal） -->
+    <div class="modal fade" id="alertProperty" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">修改属性</h4>
+                </div>
+
+                <div class="modal-body" id="alertKV">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label alertKey">key</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvalue" class="col-sm-2 control-label alertValue">value</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <input type="button" value="修改" class="btn btn-default " onclick="AlertProperty(this)"
+                                    data-dismiss="modal">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <!-- 复制zk组模态框（Modal） -->
+    <div class="modal fade" id="copyGroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myCopyLabel">复制组</h4>
+                </div>
+
+                <div class="modal-body" id="alertKV">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label ">新组名</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputCopyGroup" placeholder="请输入新的组名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <input type="button" value="修改" class="btn btn-default " onclick="syncGroup(this)"
+                                    data-dismiss="modal">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <!-- 同步至其它环境的模态框（Modal） -->
+
+    <div class="modal fade" id="syncOtherGroupModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="mySyncLabel">同步组至其它环境</h4>
+                </div>
+
+                <div class="modal-body" id="alertKV">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group ">
+                            <!-- 当 errors 不为空，遍历显示每一个 error -->
+                            <label class="col-sm-2 control-label ">环境选择</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="syncEnv" name="env" required="">
+                                    {% for env in counts.env_list %}
+                                    <option value={{env[1]}}>{{env[1]}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label ">密码</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" id="inputGroupPass"
+                                    placeholder="请输入密码，若同步环境的节点不存在，则以此为节点密码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <input type="button" value="修改" class="btn btn-default " onclick="syncOhterGroup(this)"
+                                    data-dismiss="modal">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    {% if counts.password_check %}
+    <div class="container" style="margin-bottom:10px; margin-top: 10px;" id="addGroup">
+        组名：<label style="padding-right: 20px"> <input type="text" id="GroupInput"></label>
+        <label style="padding-right: 20px">
+            <button class="btn btn-primary btn-sm" onclick="addZkGroup('{{counts.env}}','{{counts.node}}','{{counts.version}}')">添加组</button>
+        </label><label style="padding-right: 10px"></label>
+    </div>
+    <!--
+    <div class="container" style="margin-bottom:10px; margin-top: 10px;" id="addGroup">
+        <button class="btn btn-primary btn-sm " data-toggle="modal"
+            onclick="addGroup('{{counts.env}}','{{counts.node}}','{{counts.version}}')"> 添加组</button>
+    </div> -->
+    {% endif %}
+
+    {% for group in counts.group_data %}
+    <div class="panel panel-default" id="{{group}}Div">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#{{group}}" href="#{{group}}">
+                    {{ group }}
+                </a>
+                {% if counts.password_check %}
+                <a class="navbar-right col-lg-1" style="text-align:right" data-toggle="collapse"
+                    onclick="deleteGroup('{{counts.env}}','{{counts.node}}','{{counts.version}}','{{group}}')">
+                    删除 </a>
+                <a type="Button" class="navbar-right col-lg-1" style="text-align:right" data-toggle="modal"
+                    onclick="importGroupModel('{{ group }}')"> 导入 </a>
+                <a class="navbar-right col-lg-1" style="text-align:right" data-toggle="collapse"
+                    onclick="exportGroup('{{counts.env}}','{{counts.node}}','{{counts.version}}','{{group}}')">
+                    导出 </a>
+                <a class="navbar-right col-lg-1" style="text-align:right" data-toggle="collapse"
+                    onclick="copyGroupLead('{{counts.env}}','{{counts.node}}','{{counts.version}}','{{group}}')">
+                    复制 </a>
+                <a class="navbar-right col-lg-5" style="text-align:right" data-toggle="collapse"
+                    onclick="syncGroupLead('{{counts.env}}','{{counts.node}}','{{counts.version}}','{{group}}')">
+                    同步至其它环境 </a>
+                {% endif %}
+            </h4>
+        </div>
+
+        <div id="{{group}}" class="panel-collapse collapse">
+
+            {% if counts.password_check %}
+            <div class="container" style="margin-bottom:10px; margin-top: 10px;">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label for="{{group}}_ckey" class="margin: 10px;  control-label">key: </label>
+                        <input type="text" class="form-control" id="{{group}}_ckey" placeholder="请输入key">
+                    </div>
+                    <div class="form-group">
+                        <label for="{{group}}_cvalue" class="control-label">value: </label>
+                        <input type="text" class="form-control" id="{{group}}_cvalue" placeholder="请输入value">
+                    </div>
+                    <input type="button" value="添加属性" class="btn btn-default "
+                        onclick="CreateProperty('{{counts.env}}','{{counts.node}}','{{counts.version}}','{{group}}', this.parentNode.parentNode.rowIndex)"
+                        data-dismiss="modal">
+                </form>
+            </div>
+
+            <!--
+                            <div class="container" style="margin-bottom:10px; margin-top: 10px;">
+                                <button class="btn btn-primary btn-sm glyphicon glyphicon-plus" data-toggle="modal"
+                                    onclick="GetGroup('{{group}}')"> 添加属性</button>
+                            </div>-->
+            {% endif %}
+            <div class="panel-body">
+                <table id="{{group}}Table" class="panel-body table table-striped">
+                    <tbody>
+                        <tr>
+                            {% if counts.password_check %}
+                            <th>操作</th>
+                            {% endif %}
+                            <th>key</th>
+                            <th>value</th>
+                        </tr>
+
+                        {% for key in counts.group_data[group] %}
+                        <tr>
+                            {% if counts.password_check %}
+                            <td width="10%" class="dataOperating">
+                                <!-- 使用了俩个 Bootstrap 的 icon 代表编辑和删除操作 -->
+                                <div class="btn-group" role="group">
+                                    <a onclick="AlertTable('{{counts.env}}','{{counts.node}}','{{counts.version}}','{{group}}', this, this.parentNode.parentNode.parentNode.rowIndex)"
+                                        type="button" class="btn btn-default btn-sm" title="编辑" data-key="{{key}}"
+                                        data-value="{{ counts.group_data[group][key] }}">
+                                        <span class="glyphicon glyphicon-pencil" title="编辑" aria-hidden="true"> </span>
+                                    </a>
+                                    <a type="button" class="btn btn-default btn-sm" title="删除"
+                                        onclick="DeleteProperty('{{counts.env}}','{{counts.node}}','{{counts.version}}','{{group}}','{{key}}', this.parentNode.parentNode.parentNode.rowIndex)">
+                                        <span class="glyphicon glyphicon-trash" title="删除" aria-hidden="true"></span>
+                                    </a>
+                                </div>
+                            </td>
+                            {% endif %}
+                            <td width="40px" style="table-layout: fixed; word-wrap:break-all; margin-bottom: 30px;"
+                                class="dataKey" data-key="{{key}}">{{ key }}</td>
+                            <td style="table-layout: fixed;word-break:break-all; word-wrap:break-all; margin-bottom: 30px;"
+                                class="dataValue" data-value="{{counts.group_data[group][key]}}">
+                                {{ counts.group_data[group][key] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
