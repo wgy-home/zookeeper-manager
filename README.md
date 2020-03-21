@@ -33,3 +33,4 @@ hotfix_host = 127.0.0.1:2181
 # flask run --host='0.0.0.0'  -p '5000'
 ```
 
+[WIKI](https://github.com/wgy-home/zookeeper-manager/wiki)
